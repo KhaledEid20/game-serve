@@ -50,4 +50,15 @@ public class PlayerController : ControllerBase
         return BadRequest(result);
     }
 
+    [HttpPost("[action]")]
+    public async Task<IActionResult> JoinRoom()
+    {
+        var result = await _unitOfWork.Players.JoinRoom();
+        if (result.Success)
+        {
+            return Ok(result.Success);
+        }
+        return BadRequest(result);
+    }
+
 }
