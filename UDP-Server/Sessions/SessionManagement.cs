@@ -12,12 +12,12 @@ public class SessionManagement
         Console.WriteLine($"New Session Added : {iP} with ID : {EndPoints[iP]}");
     }
 
-    private async Task<int> GeneratePlayerID()
+    private  Task<int> GeneratePlayerID()
     {
         {
             var id = System.Math.Abs(System.Guid.NewGuid().GetHashCode());
             if (id == 0) id = 1;
-            return id;
+            return Task.FromResult(id);
         }
     }
 }
