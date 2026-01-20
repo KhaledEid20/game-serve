@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Threading.Channels;
 using game_server.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using UDP_Server.Networking;
 using UDP_Server.Networking.Packets;
 using UDP_Server.Sessions;
