@@ -4,6 +4,7 @@ using game_server.Data;
 using Microsoft.EntityFrameworkCore;
 using UDP_Server.Networking;
 using UDP_Server.Networking.Packets;
+using UDP_Server.Packet_Parsing;
 using UDP_Server.Sessions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +27,7 @@ builder.Services.AddSingleton<Channel<RawPacket>>(
 
 // The Dependency Injection for UDP Client Background Service
 builder.Services.AddHostedService<UDPClientListner>();
-
+builder.Services.AddHostedService<PacketParsing>();
 
 // The Dependency Injections for Repositories and Unit of Work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using game_server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using UDP_Server.Sessions;
 
@@ -10,11 +11,13 @@ public class PlayerReposirory : IBase<Player>, IPlayer
     private readonly AppDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private SessionManagement _sessionManagement;
-    public PlayerReposirory(AppDbContext context, IHttpContextAccessor httpContextAccessor , SessionManagement sessionManagement)
+    private readonly UDPOption _options;
+    public PlayerReposirory(AppDbContext context, IHttpContextAccessor httpContextAccessor , SessionManagement sessionManagement , IOptions<UDPOption> options)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
         _sessionManagement = sessionManagement; 
+        _options = options.Value;
     }
     public async Task<ResultDTO<string>> addPlayer(Player nPlayer)
     {
@@ -90,36 +93,39 @@ public class PlayerReposirory : IBase<Player>, IPlayer
         }
     }
 
-
-
-    public async Task<ResultDTO<string>> JoinRoom()
+    public async Task<ResultDTO<UDPSocket>> JoinRoom()
     {
         try
         {
             var context = _httpContextAccessor.HttpContext;
             if (context == null)
             {
-                return await Task.FromResult(new ResultDTO<string>()
+                return await Task.FromResult(new ResultDTO<UDPSocket>()
                 {
                     Success = false,
-                    data = "can't Extract the IP Address"
+                    data = null
                 });
             }
 
             if (context.Items.TryGetValue("ClientIP", out var clientIpObj) && clientIpObj is IPEndPoint clientIp)
             {
 
-                await _sessionManagement.AddSession(clientIp);
+                var playerID = await _sessionManagement.AddSession(clientIp);
                 
-                return await Task.FromResult(new ResultDTO<string>()
+                return await Task.FromResult(new ResultDTO<UDPSocket>()
                 {
                     Success = true,
-                    data = "The Player Joined the Room Successfully"
+                    data = {
+                        playerID = playerID,
+                        ServerIP = _options.IpAdress,
+                        port = _options.Port
+
+                    }
                 });
             }
             else
             {
-                return await Task.FromResult(new ResultDTO<string>()
+                return await Task.FromResult(new ResultDTO<UDPSocket>()
                 {
                     Success = false,
                     data = null

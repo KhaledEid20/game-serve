@@ -1,8 +1,8 @@
 namespace UDP_Server.Networking.Packets;
 public enum MessageType
 {
-    JoinConfirmation,
-    JoinSuccess,
-    JoinFailure,
-    stateUpdate
+    JoinRequest = 0,
+    JoinConfirmation = 1,
+    JoinSuccess = 2,
+    stateUpdate = 3,
 }

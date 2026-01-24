@@ -6,10 +6,11 @@ public class SessionManagement
     private Dictionary<IPEndPoint , int> EndPoints = new Dictionary<IPEndPoint, int>();
     private Dictionary<int , ClientSession> Sessions = new Dictionary<int, ClientSession>();
 
-    public async Task AddSession(IPEndPoint iP)
+    public async Task<int> AddSession(IPEndPoint iP)
     {
         EndPoints[iP] = await GeneratePlayerID();
         Console.WriteLine($"New Session Added : {iP} with ID : {EndPoints[iP]}");
+        return EndPoints[iP];
     }
 
     private  Task<int> GeneratePlayerID()
