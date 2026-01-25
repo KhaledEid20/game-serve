@@ -56,7 +56,7 @@ public class PlayerController : ControllerBase
         var result = await _unitOfWork.Players.JoinRoom();
         if (result.Success)
         {
-            return Ok(result.Success);
+            return Ok(result);
         }
         return BadRequest(result);
     }

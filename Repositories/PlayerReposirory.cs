@@ -112,16 +112,16 @@ public class PlayerReposirory : IBase<Player>, IPlayer
 
                 var playerID = await _sessionManagement.AddSession(clientIp);
                 
-                return await Task.FromResult(new ResultDTO<UDPSocket>()
+                return new ResultDTO<UDPSocket>()
                 {
                     Success = true,
-                    data = {
+                    data = new UDPSocket
+                    {
                         playerID = playerID,
                         ServerIP = _options.IpAdress,
                         port = _options.Port
-
                     }
-                });
+                };
             }
             else
             {
