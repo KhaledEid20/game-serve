@@ -5,11 +5,9 @@ PORT="3030"
 
 MESSAGE='{
   "_type": 0,
-  "playerId": 1111,
+  "playerId": 1439077254,
   "roomId": "2020",
   "payload": "SEVMTE8="
 }'
 
-while [ true ]; do
-    echo -n "$MESSAGE" | nc -u -w1 $IP $PORT
-done
+echo -n "$MESSAGE" | nc -u -p 5002 $IP $PORT

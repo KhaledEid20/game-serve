@@ -18,11 +18,16 @@ builder.Services.Configure<UDPOption>(builder.Configuration.GetSection("UDP"));
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<SessionManagement>();
+
+builder.Services.AddSingleton<SendPacket>();
+builder.Services.AddSingleton<SessionManagement>();
 
 // THe Channel for UDP Communication
 builder.Services.AddSingleton<Channel<RawPacket>>(
     Channel.CreateUnbounded<RawPacket>()
+);
+builder.Services.AddSingleton<Channel<UpdatedData>>(
+    Channel.CreateUnbounded<UpdatedData>()
 );
 
 // The Dependency Injection for UDP Client Background Service

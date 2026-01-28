@@ -42,7 +42,7 @@ class UDPClientListner : BackgroundService
             string json = Encoding.UTF8.GetString(buffer);
 
             var packet = JsonSerializer.Deserialize<RawPacket>(json);
-
+            packet.clientIP = result.RemoteEndPoint;
 
             try
             {

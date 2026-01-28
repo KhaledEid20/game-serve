@@ -5,4 +5,5 @@ public enum MessageType
     JoinConfirmation = 1,
     JoinSuccess = 2,
     stateUpdate = 3,
+    JoinFailure = 4
 }

@@ -17,7 +17,7 @@ public class SendPacket
        
        public async Task Send(RawPacket packet , IPEndPoint remote)
     {
-        var Sender = new UdpClient(_options.IpAdress , _options.Port);
+        var Sender = new UdpClient();
 
         try
         {
