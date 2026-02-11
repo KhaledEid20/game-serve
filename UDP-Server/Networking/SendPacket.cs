@@ -10,9 +10,11 @@ namespace UDP_Server.Networking;
 public class SendPacket
 {
        private readonly UDPOption _options;
-       public SendPacket(IOptions<UDPOption> options)
+       private readonly ILogger<SendPacket> _logger;
+       public SendPacket(IOptions<UDPOption> options , ILogger<SendPacket> logger)
        {
             _options = options.Value;
+            _logger = logger;
        }
        
        public async Task Send(RawPacket packet , IPEndPoint remote)
@@ -24,10 +26,11 @@ public class SendPacket
             string json = JsonSerializer.Serialize(packet);
             byte[] data = Encoding.UTF8.GetBytes(json);
             await Sender.SendAsync(data , data.Length , remote);
+            _logger.LogInformation("Data sent via UDP Succefully : {@Packet}" , packet);
         }
         catch(Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex ,"can't Send the Packet via UDP");
         }
     }
 }

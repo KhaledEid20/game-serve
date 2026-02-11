@@ -11,18 +11,26 @@ public class PacketParsing : BackgroundService
     private readonly Channel<UpdatedData> _gameloopChannel;
     private readonly SessionManagement _sessionManagement;
     private readonly SendPacket _sendPacket;
-    public PacketParsing(Channel<RawPacket> channel , SessionManagement sessionManagement , SendPacket sendPacket , Channel<UpdatedData>gameloop)
+    private readonly ILogger<PacketParsing> _logger;
+    public PacketParsing(Channel<RawPacket> channel ,
+     SessionManagement sessionManagement ,
+      SendPacket sendPacket ,
+       Channel<UpdatedData>gameloop,
+       ILogger<PacketParsing> logger)
+       
     {
         _channel = channel;
         _sessionManagement = sessionManagement;
         _sendPacket = sendPacket;
         _gameloopChannel = gameloop;
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while(!stoppingToken.IsCancellationRequested)
         {
+            _logger.LogInformation("The Packet Parsing Service Currently Up");
             try
             {
                 var packet = await _channel.Reader.ReadAsync(stoppingToken);
@@ -33,6 +41,7 @@ public class PacketParsing : BackgroundService
                     var newPacket = new RawPacket();
                     if(await _sessionManagement.playerIDLookUp(packet.clientIP , packet.playerId))
                     {
+                        _logger.LogInformation("The Player Exists in the Connection Queue");
                         newPacket = new RawPacket()
                         {
                             _type = MessageType.JoinConfirmation,
@@ -44,6 +53,8 @@ public class PacketParsing : BackgroundService
                     }
                     else
                     {
+                        _logger.LogWarning("Player ID mismatch for IP {packet.clientIP}. Cannot join room {packet.roomId}." , packet.clientIP , packet.roomId);
+
                         newPacket = new RawPacket()
                         {
                             _type = MessageType.JoinFailure,
@@ -67,17 +78,26 @@ public class PacketParsing : BackgroundService
                     }
                     else
                     {
-                        Console.WriteLine($"Player ID mismatch for IP {packet.clientIP}. Cannot join room {packet.roomId}.");
+                        _logger.LogWarning("Player ID mismatch for IP {packet.clientIP}. Cannot join room {packet.roomId}." , packet.clientIP , packet.roomId);
                     }
                 }
                 if(packet._type == MessageType.stateUpdate)
                 {
-                    await _gameloopChannel.Writer.WriteAsync(packet.data);
-                    Console.WriteLine("The Updated Data is moved to the gameloop Channel");
+                    try
+                    {
+                        await _gameloopChannel.Writer.WriteAsync(packet.data);
+                        _logger.LogInformation("The data is passed to the gameLoop Service");
+                    }
+                    catch (OperationCanceledException ex)
+                    {
+                        _logger.LogError(ex , "Data can't be passed Through the gameLoop Channel");
+                    }
+                    
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError(ex , "The Packet Parser Service is Down");
                 return;
             }
         }

@@ -12,7 +12,7 @@ public class SessionController : ControllerBase
 
     private IUnitOfWork _unitOfWork;
 
-    public SessionController(IUnitOfWork unitOfWork)
+    public SessionController(IUnitOfWork unitOfWork , ILogger<SessionController> logger)
     {
         _unitOfWork = unitOfWork;
     }

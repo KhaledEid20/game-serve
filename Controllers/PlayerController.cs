@@ -11,10 +11,13 @@ public class PlayerController : ControllerBase
 {
 
     private IUnitOfWork _unitOfWork;
+    private readonly ILogger<PlayerController> _logger;
 
-    public PlayerController(IUnitOfWork unitOfWork)
+    public PlayerController(IUnitOfWork unitOfWork , ILogger<PlayerController> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
+
     }
 
     [HttpPost("[action]")]
@@ -42,11 +45,14 @@ public class PlayerController : ControllerBase
     [HttpGet("[action]")]
     public async Task<IActionResult> GetAllUser()
     {
+        _logger.LogInformation("Fetching all Player ...");
         var result = await _unitOfWork.Players.GetAllUser();
         if (result.Success)
         {
+            _logger.LogInformation("Player Fetched {Count}" , result.data.Count);
             return Ok(result.data);
         }
+        _logger.LogWarning("Failed Fetching Data {Result}" , result);
         return BadRequest(result);
     }
 

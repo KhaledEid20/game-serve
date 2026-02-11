@@ -7,11 +7,15 @@ public class SessionManagement
 {
     private Dictionary<IPEndPoint , int> EndPoints = new Dictionary<IPEndPoint, int>();
     private Dictionary<int , ClientSession> Sessions = new Dictionary<int, ClientSession>();
-
+    private readonly ILogger<SessionManagement> _logger;
+    public SessionManagement(ILogger<SessionManagement> logger)
+    {
+        _logger = logger;
+    }
     public async Task<int> AddSession(IPEndPoint iP)
     {
         EndPoints[iP] = await GeneratePlayerID();
-        Console.WriteLine($"New Session Added : {iP} with ID : {EndPoints[iP]}");
+        _logger.LogInformation("New Session Added : {iP} with ID : {EndPoints[iP]}" , iP, EndPoints[iP]);
         return EndPoints[iP];
     }
 
@@ -19,16 +23,19 @@ public class SessionManagement
     {
         if(EndPoints.ContainsKey(iP))
         {
+            _logger.LogInformation("The IP : {IP} is Assigned To The Player ID : {Player Id}", iP , EndPoints[iP]);
             return EndPoints[iP] == playerID;
         }
         else
         {
+            _logger.LogError("The Ip isn't Exist in The Connection Queue");
             return false;
         }
     }
 
     public async Task<bool> ConnectionLookUp(int PlayerId)
     {
+
         return Sessions.ContainsKey(PlayerId);
     }
 
@@ -36,6 +43,7 @@ public class SessionManagement
     {
         if(packet.playerId == 0 || Sessions.ContainsKey(packet.playerId))
         {
+            _logger.LogWarning("The Session is Alreay Existed");
             return false;
         }
         var session = new ClientSession()
@@ -46,6 +54,7 @@ public class SessionManagement
             RoomId = packet.roomId
         };
         Sessions[packet.playerId] = session;
+        _logger.LogInformation("The new Session Just added to the Session Queue");
         return true;
     }
 
@@ -53,9 +62,11 @@ public class SessionManagement
     {
         if(Sessions[PlayerId].IsConnected == false)
         {
-            Sessions[PlayerId].IsConnected = false;
+            Sessions[PlayerId].IsConnected = true;
+            _logger.LogInformation("The Connection Established Succefully");
             return true;
         }
+        _logger.LogWarning("The Connection is Already Established");
         return false;
 
     }
