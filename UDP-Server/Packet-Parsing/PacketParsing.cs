@@ -39,19 +39,20 @@ public class PacketParsing : BackgroundService
                 if(packet._type == MessageType.JoinRequest)
                 {
                     var newPacket = new RawPacket();
-                    if(await _sessionManagement.playerIDLookUp(packet.clientIP , packet.playerId))
+                    try 
                     {
-                        _logger.LogInformation("The Player Exists in the Connection Queue");
+                        int playerID = await _sessionManagement.AddSession(packet.clientIP);
+                        _logger.LogInformation("The Player added to the Connection Queue player id {playerId} attahed" , playerID);
                         newPacket = new RawPacket()
                         {
                             _type = MessageType.JoinConfirmation,
-                            playerId = packet.playerId,
+                            playerId = playerID,
                             roomId = packet.roomId,
                         };
                         await _sessionManagement.AddClientSession(packet); // create the clientSession object
                         await _sendPacket.Send(newPacket , packet.clientIP); // send confirmation
                     }
-                    else
+                    catch
                     {
                         _logger.LogWarning("Player ID mismatch for IP {packet.clientIP}. Cannot join room {packet.roomId}." , packet.clientIP , packet.roomId);
 
@@ -97,7 +98,7 @@ public class PacketParsing : BackgroundService
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError(ex , "The Packet Parser Service is Down");
+                _logger.LogWarning(ex , "The Packet Parser Service is Down");
                 return;
             }
         }

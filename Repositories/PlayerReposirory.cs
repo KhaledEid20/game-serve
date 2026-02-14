@@ -92,49 +92,4 @@ public class PlayerReposirory : IBase<Player>, IPlayer
             throw new Exception(ex.Message);
         }
     }
-
-    public async Task<ResultDTO<UDPSocket>> JoinRoom()
-    {
-        try
-        {
-            var context = _httpContextAccessor.HttpContext;
-            if (context == null)
-            {
-                return await Task.FromResult(new ResultDTO<UDPSocket>()
-                {
-                    Success = false,
-                    data = null
-                });
-            }
-
-            if (context.Items.TryGetValue("ClientIP", out var clientIpObj) && clientIpObj is IPEndPoint clientIp)
-            {
-
-                var playerID = await _sessionManagement.AddSession(clientIp);
-                
-                return new ResultDTO<UDPSocket>()
-                {
-                    Success = true,
-                    data = new UDPSocket
-                    {
-                        playerID = playerID,
-                        ServerIP = _options.IpAdress,
-                        port = _options.Port
-                    }
-                };
-            }
-            else
-            {
-                return await Task.FromResult(new ResultDTO<UDPSocket>()
-                {
-                    Success = false,
-                    data = null
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
-    }
 }
