@@ -8,7 +8,7 @@ public class RawPacket
     public int playerId { get; set; }
     public string roomId { get; set; }
     public IPEndPoint clientIP  { get; set; }
-    public byte[] payload { get; set; }
+    public string payload { get; set; }
     public UpdatedData data {get; set;}
 
 }

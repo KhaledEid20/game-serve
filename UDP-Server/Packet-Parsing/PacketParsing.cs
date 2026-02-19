@@ -17,7 +17,6 @@ public class PacketParsing : BackgroundService
       SendPacket sendPacket ,
        Channel<UpdatedData>gameloop,
        ILogger<PacketParsing> logger)
-       
     {
         _channel = channel;
         _sessionManagement = sessionManagement;
@@ -42,6 +41,7 @@ public class PacketParsing : BackgroundService
                     try 
                     {
                         int playerID = await _sessionManagement.AddSession(packet.clientIP);
+                        packet.playerId = playerID;
                         _logger.LogInformation("The Player added to the Connection Queue player id {playerId} attahed" , playerID);
                         newPacket = new RawPacket()
                         {
@@ -61,7 +61,7 @@ public class PacketParsing : BackgroundService
                             _type = MessageType.JoinFailure,
                             playerId = packet.playerId,
                             roomId = packet.roomId,
-                            payload = System.Text.Encoding.UTF8.GetBytes("Invalid Player ID")
+                            payload = "Invalid Player ID"
                         };
                         await _sendPacket.Send(newPacket , packet.clientIP); // send Rejection
 
@@ -93,7 +93,6 @@ public class PacketParsing : BackgroundService
                     {
                         _logger.LogError(ex , "Data can't be passed Through the gameLoop Channel");
                     }
-                    
                 }
             }
             catch (OperationCanceledException ex)

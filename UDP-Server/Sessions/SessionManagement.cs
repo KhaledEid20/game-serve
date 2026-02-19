@@ -68,9 +68,8 @@ public class SessionManagement
         }
         _logger.LogWarning("The Connection is Already Established");
         return false;
-
     }
-    private  Task<int> GeneratePlayerID()
+    private Task<int> GeneratePlayerID()
     {
         {
             var id = System.Math.Abs(System.Guid.NewGuid().GetHashCode());
