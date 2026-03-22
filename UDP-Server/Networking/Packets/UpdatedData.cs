@@ -1,4 +1,5 @@
 namespace UDP_Server.Networking.Packets;
+
 public class UpdatedData
 {
     public string state1 { get; set; }

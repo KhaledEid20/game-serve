@@ -14,7 +14,7 @@ class UDPClientListner : BackgroundService
     private readonly Channel<RawPacket> _channel;
     private readonly UDPOption _options;
     private readonly ILogger<UDPClientListner> _logger;
-    public UDPClientListner(Channel<RawPacket> channel, IOptions<UDPOption> options , ILogger<UDPClientListner> logger)
+    public UDPClientListner(Channel<RawPacket> channel, IOptions<UDPOption> options, ILogger<UDPClientListner> logger)
     {
         _channel = channel;
         _options = options.Value;
@@ -24,7 +24,7 @@ class UDPClientListner : BackgroundService
     {
         var ip = IPAddress.Parse(_options.IpAdress);
         using UdpClient listner = new UdpClient(new IPEndPoint(ip, _options.Port));
-        _logger.LogInformation("The UDP Serverl Listining on : {ip} / {port}" , ip , _options.Port);
+        _logger.LogInformation("The UDP Server Listening on : {ip} / {port}", ip, _options.Port);
         while (!stoppingToken.IsCancellationRequested)
         {
             UdpReceiveResult result;
@@ -32,14 +32,14 @@ class UDPClientListner : BackgroundService
             {
                 result = await listner.ReceiveAsync(stoppingToken);
 
-                _logger.LogInformation("Message Recieved from {@Source}" , new {SenderIp = result.RemoteEndPoint.ToString()});
+                _logger.LogInformation("Message Recieved from {@Source}", new { SenderIp = result.RemoteEndPoint.ToString() });
 
                 byte[] messageReceived = Encoding.ASCII.GetBytes("Message Received\n");
                 await listner.SendAsync(messageReceived, messageReceived.Length, result.RemoteEndPoint);
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError( ex, "Can't receive the Message");
+                _logger.LogError(ex, "Can't receive the Message");
                 break;
             }
             try
@@ -50,23 +50,23 @@ class UDPClientListner : BackgroundService
                 var packet = JsonSerializer.Deserialize<RawPacket>(json);
                 packet.clientIP = result.RemoteEndPoint;
 
-                _logger.LogInformation("Packet Serialized Succefully");
+                _logger.LogInformation("Packet Serialized Successfully");
 
                 try
                 {
                     await _channel.Writer.WriteAsync(packet, stoppingToken);
-                    _logger.LogInformation("Data Pushed to The Channel 1 {Packet}" , packet);
+                    _logger.LogInformation("Data Pushed to The Channel 1 {Packet}", packet);
                 }
                 catch (OperationCanceledException ex)
                 {
-                    _logger.LogError(ex ,"Error while Pushing the Packet Through the Channel 1");
+                    _logger.LogError(ex, "Error while Pushing the Packet Through the Channel 1");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex ,"Error while Pushing the Packet Through the Channel 1");
+                _logger.LogError(ex, "Error while Pushing the Packet Through the Channel 1");
             }
-            
+
         }
     }
 }
