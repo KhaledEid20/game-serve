@@ -2,7 +2,6 @@ import socket
 import json
 import threading
 
-
 Host_ip = "10.10.10.10"
 Host_port = 5005
 
@@ -18,6 +17,7 @@ UserInfo = {
 }
 
 # -------------------------------The packets type---------------------------------------
+
 def joinRequest():
     raw_packet = {
     "_type": 0,
@@ -32,10 +32,10 @@ def joinRequest():
 
 def JoinSuccess():
     raw_packet = {
-    "_type": 2,
-    "roomId": UserInfo["roomId"],
-    "playerId" : UserInfo["playerId"],
-    "payload": "joinRequest"
+        "_type": 2,
+        "roomId": UserInfo["roomId"],
+        "playerId" : UserInfo["playerId"],
+        "payload": "joinRequest"
     }
     packet = json.dumps(raw_packet).encode()
     s.sendto(packet , (ServerIp , ServerPort))
@@ -59,7 +59,6 @@ def listen():
             if(obj["_type"] == 1):
                 UserInfo["playerId"] = obj["playerId"]
                 UserInfo["roomId"] = obj["roomId"]
-            if(obj["_type"] == 1):
                 JoinSuccess()
 
         except UnicodeDecodeError:

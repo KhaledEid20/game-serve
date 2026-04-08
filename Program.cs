@@ -12,6 +12,7 @@ using UDP_Server.Sessions;
 var builder = WebApplication.CreateBuilder(args);
 
 
+
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -43,7 +44,7 @@ builder.Services.AddScoped<IPlayer, PlayerReposirory>();
 builder.Services.AddScoped<ISession, SessionRepository>();
 
 // Serilog configuration
-builder.Host.UseSerilog((context , configuration) =>
+builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
 

@@ -1,0 +1,33 @@
+services:
+  game-server:
+    build: 
+      dockerfile : Dockerfile
+    container_name : game-server
+    ports:
+      - 5051:8080
+    depends_on:
+      - sqlserver
+      - seq
+      
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=GameDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+  sqlserver:
+    image : mcr.microsoft.com/mssql/server:2022-latest
+    container_name : sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+    ports:
+      - 1433:1433
+  seq:
+    image : datalust/seq
+    container_name : seq
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=YourStrongPassword123!
+    ports:
+      - 5341:5341
+      - 8081:80
+
+volumes:
+  sql_data:
